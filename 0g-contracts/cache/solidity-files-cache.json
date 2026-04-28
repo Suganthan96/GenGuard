@@ -1,0 +1,77 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Sugan\\projects\\open\\0g-contracts\\contracts\\GuardMeshAudit.sol": {
+      "lastModificationDate": 1776597270240,
+      "contentHash": "63c073da366eef0927c9ff1c9800e465",
+      "sourceName": "contracts/GuardMeshAudit.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "GuardMeshAudit"
+      ]
+    },
+    "C:\\Users\\Sugan\\projects\\open\\0g-contracts\\contracts\\GuardMeshRegistry.sol": {
+      "lastModificationDate": 1776597220685,
+      "contentHash": "f909a1df7125e740ea5dd2c407d71670",
+      "sourceName": "contracts/GuardMeshRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "GuardMeshRegistry"
+      ]
+    }
+  }
+}

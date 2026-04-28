@@ -1,0 +1,16 @@
+{
+  "network": "testnet",
+  "chainId": 16602,
+  "deployer": "0x588F6b3169F60176c1143f8BaB47bCf3DeEbECdc",
+  "deployedAt": "2026-04-23T11:35:32.699Z",
+  "contracts": {
+    "GuardMeshRegistry": {
+      "address": "0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619",
+      "txHash": "0x30da53979ef818e7abda95149c16af508b500e445d02cb87d26d33e8258356c2"
+    },
+    "GuardMeshAudit": {
+      "address": "0x522748669646A1a099474cd7f98060968A80E812",
+      "txHash": "0x8a197c365a821ed226bac9a75dee7d021882181a69defff68c4f420beb8cb645"
+    }
+  }
+}
