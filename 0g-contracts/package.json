@@ -1,0 +1,27 @@
+{
+  "name": "guardmesh-contracts",
+  "version": "1.0.0",
+  "description": "GuardMesh smart contracts — decentralized AI agent firewall on 0G Chain",
+  "scripts": {
+    "compile":          "hardhat compile",
+    "test":             "hardhat test",
+    "deploy:testnet":   "hardhat run scripts/deploy.js --network testnet",
+    "deploy:mainnet":   "hardhat run scripts/deploy.js --network mainnet",
+    "verify:testnet":   "hardhat run scripts/verify.js --network testnet",
+    "verify:mainnet":   "hardhat run scripts/verify.js --network mainnet",
+    "record-decision:testnet": "hardhat run scripts/record-decision.js --network testnet",
+    "record-decision:mainnet": "hardhat run scripts/record-decision.js --network mainnet",
+    "clean":            "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox":       "^5.0.0",
+    "@nomicfoundation/hardhat-verify":        "^2.0.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers":        "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "hardhat":   "^2.22.0",
+    "chai":      "^4.4.1",
+    "ethers":    "^6.13.0",
+    "dotenv":    "^16.4.5"
+  }
+}
