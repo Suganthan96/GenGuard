@@ -1,0 +1,15 @@
+{
+  "agent_id": "suguagent.eth",
+  "action_type": "code_analysis",
+  "target": "workspace",
+  "content": "Planned action: run read-only analysis on pasted code. No external network besides model provider.",
+  "data_touched": [],
+  "role_scope": "openclaw_guardmesh",
+  "analysis_excerpt": "Optional short excerpt from prior reasoning.",
+  "openclaw_stats": {
+    "files_read": 2,
+    "db_queries": 0,
+    "code_analysis_runs": 1,
+    "notes": "Optional counters from OpenClaw before sending intent to guardians."
+  }
+}

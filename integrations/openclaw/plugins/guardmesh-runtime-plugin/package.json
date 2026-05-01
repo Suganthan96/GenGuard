@@ -1,0 +1,13 @@
+{
+  "name": "@local/guardmesh-runtime-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenClaw runtime plugin for GuardMesh policy gating, webhooks, and background verification.",
+  "openclaw": {
+    "extensions": [
+      "./src/index.js"
+    ]
+  }
+}
+

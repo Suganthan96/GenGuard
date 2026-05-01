@@ -1,0 +1,11 @@
+{
+  "intent": {
+    "agent_id": "",
+    "action_type": "code_analysis",
+    "target": "workspace",
+    "content": "Example intent — agent_id/role_scope filled from Web env GUARDMESH_DEFAULT_* if set.",
+    "data_touched": [],
+    "role_scope": ""
+  },
+  "consensus_threshold": "majority"
+}
