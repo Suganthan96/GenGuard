@@ -1,0 +1,33 @@
+{
+  "name": "guardmesh-guardian",
+  "version": "1.0.0",
+  "description": "GuardMesh Guardian Agent with 0G Compute Integration",
+  "type": "module",
+  "main": "guardian.js",
+  "scripts": {
+    "start": "node guardian.js",
+    "test": "node test-guardian.js",
+    "test:simple": "node test-simple.js",
+    "listener:1": "node start-guardian-listener.js guardian-1 9002",
+    "listener:2": "node start-guardian-listener.js guardian-2 9012",
+    "listener:3": "node start-guardian-listener.js guardian-3 9022",
+    "listeners:windows": "powershell -ExecutionPolicy Bypass -File ./start-all-listeners.ps1",
+    "print:axl-peers": "node print-axl-peer-env.mjs",
+    "test:axl": "node test-axl-integration.js"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "^1.2.6",
+    "@0glabs/0g-serving-broker": "^0.7.5",
+    "axios": "^1.15.2",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.16.0",
+    "node-fetch": "^3.3.0"
+  },
+  "keywords": [
+    "guardmesh",
+    "0g",
+    "ai-safety"
+  ],
+  "author": "",
+  "license": "MIT"
+}
