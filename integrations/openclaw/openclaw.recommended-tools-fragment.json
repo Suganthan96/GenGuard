@@ -1,0 +1,7 @@
+{
+  "tools": {
+    "loopDetection": {
+      "enabled": true
+    }
+  }
+}

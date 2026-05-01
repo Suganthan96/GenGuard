@@ -1,0 +1,74 @@
+{
+  "channels": {
+    "msteams": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "requireMention": true
+    },
+    "slack": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "requireMention": true
+    },
+    "mattermost": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "requireMention": true
+    },
+    "matrix": {
+      "enabled": true,
+      "dm": {
+        "policy": "pairing"
+      },
+      "groupPolicy": "allowlist",
+      "requireMention": true
+    },
+    "feishu": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "requireMention": true
+    }
+  },
+  "bindings": [
+    {
+      "match": {
+        "channel": "msteams",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    },
+    {
+      "match": {
+        "channel": "slack",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    },
+    {
+      "match": {
+        "channel": "mattermost",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    },
+    {
+      "match": {
+        "channel": "matrix",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    },
+    {
+      "match": {
+        "channel": "feishu",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    }
+  ]
+}
+

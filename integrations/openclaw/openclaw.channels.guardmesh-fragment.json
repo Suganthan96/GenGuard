@@ -1,0 +1,57 @@
+{
+  "agents": {
+    "list": [
+      {
+        "id": "guardmesh-ops",
+        "name": "GuardMesh Ops",
+        "workspace": "~/.openclaw/workspace-guardmesh",
+        "default": false
+      },
+      {
+        "id": "main",
+        "default": true
+      }
+    ]
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "set-telegram-bot-token",
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      },
+      "execApprovals": {
+        "enabled": true,
+        "target": "dm"
+      },
+      "actions": {
+        "sendMessage": true,
+        "deleteMessage": false,
+        "reactions": true,
+        "sticker": false
+      }
+    },
+    "slack": {
+      "enabled": false
+    },
+    "discord": {
+      "enabled": false
+    }
+  },
+  "bindings": [
+    {
+      "match": {
+        "channel": "telegram",
+        "accountId": "*"
+      },
+      "agentId": "guardmesh-ops"
+    }
+  ],
+  "session": {
+    "dmScope": "main"
+  }
+}

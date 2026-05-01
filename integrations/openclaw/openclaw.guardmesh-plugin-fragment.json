@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "enabled": true,
+    "load": {
+      "paths": [
+        "C:/Users/Sugan/projects/open/integrations/openclaw/plugins/guardmesh-runtime-plugin"
+      ]
+    },
+    "entries": {
+      "guardmesh-runtime": {
+        "enabled": true,
+        "hooks": {
+          "allowConversationAccess": true
+        },
+        "config": {
+          "bridgeUrl": "http://127.0.0.1:3000/api/guardmesh/intent",
+          "intentTimeoutMs": 20000,
+          "approvalTtlMs": 120000,
+          "enforceTools": [
+            "shell_command",
+            "exec",
+            "apply_patch",
+            "web_fetch"
+          ],
+          "verifyUrl": "http://127.0.0.1:3000/api/guardmesh/analysis/config",
+          "verifyIntervalMs": 300000,
+          "webhookPath": "/plugins/guardmesh/webhook",
+          "webhookToken": "set-a-real-token"
+        }
+      }
+    }
+  },
+  "tools": {
+    "loopDetection": {
+      "enabled": true
+    }
+  }
+}
