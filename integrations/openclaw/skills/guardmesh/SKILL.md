@@ -120,4 +120,3 @@ For a **single scripted** path (automation, not the in-model `exec` flow), use r
 | `GUARDMESH_BRIDGE_URL` | Optional; default `http://127.0.0.1:3000/api/guardmesh/intent` |
 | `GUARDMESH_CONSENSUS_THRESHOLD` | On **GenGuard `Web` server**: default mesh rule (`phase5`, `unanimous`, `majority`, `any`). Overridable per request with JSON **`consensus_threshold`**. |
 
-Guardian hosts need `GUARDMESH_REGISTRY_ADDRESS` + `RPC_URL` in `.env` (see `guardmesh-guardian/.env.example`).
