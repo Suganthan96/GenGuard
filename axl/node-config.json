@@ -1,0 +1,10 @@
+{
+    "PrivateKeyPath": "private.pem",
+    "Peers": [
+        "tls://5343e94fead9e87e4b5d427b235a36755355b977da91159bbb51b3a302566af2@127.0.0.1:7000",
+        "tls://588e9c92be12c08656cce45a58e76dd5dcc8a34203546b5266ef91cddc1d69e2@127.0.0.1:7000"
+    ],
+    "Listen": [
+        "tls://127.0.0.1:9001"
+    ]
+}

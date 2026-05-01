@@ -1,0 +1,10 @@
+{
+  "PrivateKeyPath": "private-3.pem",
+  "Peers": [
+    "tls://62bcea25e0a75e2270994863d9de707f48167b9af4cf3881c02eea81bd157602@127.0.0.1:9001",
+    "tls://5343e94fead9e87e4b5d427b235a36755355b977da91159bbb51b3a302566af2@127.0.0.1:7000"
+  ],
+  "api_port": 9022,
+  "tcp_port": 7000,
+  "Listen": []
+}

@@ -1,0 +1,19 @@
+{
+  "name": "0g-check",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "check": "node check-0g.mjs",
+    "balance": "node check-wallet-balance.mjs",
+    "add-ledger": "node add-ledger.mjs",
+    "test": "npm run check"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@0glabs/0g-serving-broker": "^0.7.5",
+    "ethers": "^6.16.0"
+  }
+}
