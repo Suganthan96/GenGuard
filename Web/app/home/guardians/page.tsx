@@ -24,6 +24,14 @@ export default function GuardiansPage() {
               <div className="mt-2 font-mono text-[11px] text-black/45 break-all">
                 axl://pk-{g.publicKey}
               </div>
+              <a
+                href={g.ensLink}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 text-xs text-blue-600 hover:text-blue-800 hover:underline underline-offset-2"
+              >
+                {g.ensName} →
+              </a>
               <div className="mt-1 text-xs text-black/40">{g.model}</div>
             </div>
             <div className="grid grid-cols-3 gap-6 text-center md:text-right text-sm">
