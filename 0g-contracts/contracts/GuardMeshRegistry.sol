@@ -304,7 +304,7 @@ contract GuardMeshRegistry {
     // Internal Helpers
     // ─────────────────────────────────────────────────────────────────────────
 
-    function _key(string memory agentId) internal pure returns (bytes32) {
+    function _key(string memory agentId) internal pure virtual returns (bytes32) {
         return keccak256(abi.encodePacked(agentId));
     }
 }

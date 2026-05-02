@@ -1,0 +1,29 @@
+{
+  "network": "testnet",
+  "chainId": 16602,
+  "deployer": "0x588F6b3169F60176c1143f8BaB47bCf3DeEbECdc",
+  "deployedAt": "2026-05-02T16:55:02.122Z",
+  "contracts": {
+    "GuardMeshRegistryENS": {
+      "address": "0x0925e20438AF659048643Ce747aEe38A7b916E54",
+      "txHash": "0x80dc62ae7343286e73c475426764d28c5f65e68c50d1ff64463957af1c89ec74"
+    }
+  },
+  "guardians": [
+    {
+      "id": "guardian-1",
+      "ensName": "guardian-1.guardmesh.eth",
+      "role": "code_analysis_only"
+    },
+    {
+      "id": "guardian-2",
+      "ensName": "guardian-2.guardmesh.eth",
+      "role": "data_access_audit"
+    },
+    {
+      "id": "guardian-3",
+      "ensName": "guardian-3.guardmesh.eth",
+      "role": "intent_verification"
+    }
+  ]
+}

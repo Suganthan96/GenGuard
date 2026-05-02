@@ -2,6 +2,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 Write-Host "Starting Guardian Node 2..." -ForegroundColor Green
+Write-Host "ENS: guardian-2.guardmesh.eth" -ForegroundColor Yellow
+Write-Host "ENS Link: https://sepolia.app.ens.domains/guardian-2.guardmesh.eth" -ForegroundColor Yellow
 Write-Host "API Port: 9012" -ForegroundColor Cyan
 Write-Host "Peers: tls://127.0.0.1:9001" -ForegroundColor Cyan
 Write-Host ""

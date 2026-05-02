@@ -13,7 +13,12 @@
     "listener:3": "node start-guardian-listener.js guardian-3 9022",
     "listeners:windows": "powershell -ExecutionPolicy Bypass -File ./start-all-listeners.ps1",
     "print:axl-peers": "node print-axl-peer-env.mjs",
-    "test:axl": "node test-axl-integration.js"
+    "test:axl": "node test-axl-integration.js",
+    "guardian:bootstrap": "node guardian-ens-boot.mjs",
+    "guardian:bootstrap:g1": "powershell -Command \"$env:GUARDIAN_ID='guardian-1'; node guardian-ens-boot.mjs\"",
+    "guardian:bootstrap:g2": "powershell -Command \"$env:GUARDIAN_ID='guardian-2'; node guardian-ens-boot.mjs\"",
+    "guardian:bootstrap:g3": "powershell -Command \"$env:GUARDIAN_ID='guardian-3'; node guardian-ens-boot.mjs\"",
+    "test:ens": "node test-ens.mjs"
   },
   "dependencies": {
     "@0gfoundation/0g-ts-sdk": "^1.2.6",

@@ -1,0 +1,54 @@
+{
+  "name": "guardmesh-guardian",
+  "version": "1.0.0",
+  "description": "Guardian agent implementation for GuardMesh with ENS integration",
+  "type": "module",
+  "main": "guardian.js",
+  "scripts": {
+    "start": "node guardian.js",
+    "dev": "node --watch guardian.js",
+    "test": "node --test test/**/*.test.js",
+    
+    "guardian:bootstrap": "node guardian-ens-boot.mjs",
+    "guardian:example": "node example-ens-complete.mjs",
+    "guardian:update-metadata": "node -e \"import('./guardian-ens-boot.mjs').then(m => m.updateGuardianMetadata(process.env.PRIVATE_KEY, process.argv[2], {}))\" ",
+    "guardian:resolve": "node -e \"import('./ens-utils.mjs').then(m => m.resolveGuardianAddress(process.argv[2]).then(console.log))\" ",
+    "guardian:get-metadata": "node -e \"import('./ens-utils.mjs').then(m => m.getGuardianMetadata(process.argv[2]).then(a => console.log(JSON.stringify(a, null, 2))))\" ",
+    
+    "test:ens-resolution": "node test/test-ens-resolution.js",
+    "test:ens-metadata": "node test/test-ens-metadata.js",
+    "test:integration": "node test/test-integration.js",
+    
+    "deploy:guardmesh-ens": "npx hardhat run scripts/deploy-guardmesh-ens.js --network 0g-testnet",
+    "verify:contract": "npx hardhat verify --network 0g-testnet"
+  },
+  "dependencies": {
+    "ethers": "^6.x",
+    "viem": "^2.x",
+    "wagmi": "^2.x",
+    "@0glabs/0g-serving-broker": "latest",
+    "dotenv": "^16.x",
+    "axios": "^1.x"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "hardhat": "^2.x",
+    "@openzeppelin/hardhat-upgrades": "^2.x",
+    "hardhat-deploy": "^0.x"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "guardmesh",
+    "ens",
+    "0g-chain",
+    "decentralized",
+    "policy-evaluation"
+  ],
+  "author": "GenGuard Team",
+  "license": "MIT"
+}

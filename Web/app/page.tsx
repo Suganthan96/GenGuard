@@ -9,6 +9,7 @@ import { RevealText } from "@/components/reveal-text"
 import { StackingAgentCards } from "@/components/stacking-agent-cards"
 import { MobileNav } from "@/components/mobile-nav"
 import { DevExSection } from "@/components/devex-section"
+import { GuardianENSSection } from "@/components/GuardianENSCard"
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -522,6 +523,9 @@ export default function GenguardPage() {
           </div>
         </div>
       </section>
+
+      {/* ── ENS IDENTITY ──────────────────────────────────────────────── */}
+      <GuardianENSSection />
 
       {/* ── FOOTER ────────────────────────────────────────────────────────── */}
       <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">

@@ -72,6 +72,118 @@
       "artifacts": [
         "GuardMeshRegistry"
       ]
+    },
+    "C:\\Users\\Sugan\\projects\\GenGuard\\0g-contracts\\contracts\\GuardMeshAudit.sol": {
+      "lastModificationDate": 1777733491717,
+      "contentHash": "3aaf7fb5a91986822238584ae5e953d2",
+      "sourceName": "contracts/GuardMeshAudit.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "GuardMeshAudit"
+      ]
+    },
+    "C:\\Users\\Sugan\\projects\\GenGuard\\0g-contracts\\contracts\\GuardMeshRegistry-ENS.sol": {
+      "lastModificationDate": 1777740618970,
+      "contentHash": "3f8214311904cbd57b2ca64c833995a2",
+      "sourceName": "contracts/GuardMeshRegistry-ENS.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GuardMeshRegistry.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "GuardMeshRegistryENS",
+        "IENS",
+        "IResolver"
+      ]
+    },
+    "C:\\Users\\Sugan\\projects\\GenGuard\\0g-contracts\\contracts\\GuardMeshRegistry.sol": {
+      "lastModificationDate": 1777740587966,
+      "contentHash": "6945fe8522ff3da67dbee4dcab68a08f",
+      "sourceName": "contracts/GuardMeshRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "GuardMeshRegistry"
+      ]
     }
   }
 }

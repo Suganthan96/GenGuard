@@ -11,6 +11,9 @@
     "verify:mainnet":   "hardhat run scripts/verify.js --network mainnet",
     "record-decision:testnet": "hardhat run scripts/record-decision.js --network testnet",
     "record-decision:mainnet": "hardhat run scripts/record-decision.js --network mainnet",
+    "deploy:ens:testnet": "hardhat run scripts/deploy-ens.js --network testnet",
+    "deploy:ens:mainnet": "hardhat run scripts/deploy-ens.js --network mainnet",
+    "deploy:ens:local":   "hardhat run scripts/deploy-ens.js --network hardhat",
     "clean":            "hardhat clean"
   },
   "devDependencies": {
