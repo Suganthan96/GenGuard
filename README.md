@@ -49,73 +49,49 @@ Recommended active registry in web app:
   - Stores ENS name, namehash node, resolved address, metadata cache
   - Supports `assignENSName` / `registerAgentWithENS`
 
-## High-Level Architecture
+## End-to-End Architecture
 
 ```mermaid
-flowchart LR
-    A[Client / Agent Request] --> B[Web Policy + Intent API]
-    B --> C[Guardians via AXL Mesh]
-    C --> D[Consensus Result]
-    D --> E[Tool Execution Gate]
-    D --> F[Decision Bundle]
-    F --> G[0G Storage]
-    D --> H[GuardMeshAudit on 0G EVM]
-    B --> I[GuardMeshRegistryENS]
-    I --> J[0G KV Policy Mirror]
-    K[Sepolia ENS] --> I
-```
+flowchart TD
+    U[User / Agent Client] --> W[Web Dashboard + APIs<br/>Next.js]
 
-## Registration + Governance Sequence
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant U as User (Web UI)
-    participant W as Web App
-    participant R as GuardMeshRegistryENS (0G)
-    participant KV as 0G KV Sync API
-    participant ENS as Sepolia ENS Registrar
-
-    U->>W: Register agentId (e.g. myagent.eth)
-    W->>R: registerAgent(agentId, roleScope, allowedActions)
-    R-->>W: tx confirmed
-    W->>KV: POST /api/guardmesh/kv-sync (agent_id)
-    KV-->>W: policy mirrored to 0G KV
-    alt agentId endsWith .eth
-      W->>ENS: commit + register name on Sepolia
-      ENS-->>W: name registered / already registered
-      W->>R: assignENSName(agentId, ensName, owner)
-      R-->>W: ENS linked on 0G
+    subgraph REG[Registration & Identity Flow]
+      W --> R1[registerAgent on 0G]
+      R1 --> REGC[(GuardMeshRegistryENS<br/>0x0925e20438AF659048643Ce747aEe38A7b916E54)]
+      W --> KV1[POST /api/guardmesh/kv-sync]
+      KV1 --> KV[(0G KV Policy Mirror)]
+      W --> ENSR[POST /api/guardmesh/ens-register<br/>Sepolia commit-reveal]
+      ENSR --> ENS[(Sepolia ENS Registrar)]
+      ENS --> L1[.eth name minted / exists]
+      W --> R2[assignENSName on 0G]
+      R2 --> REGC
     end
-    W-->>U: Registration complete
-```
 
-## Intent Decision Sequence
+    subgraph RUN[Intent Governance Runtime]
+      W --> INTENT[/api/guardmesh/intent]
+      INTENT --> MESH[AXL Guardian Mesh]
+      MESH --> G1[Guardian 1]
+      MESH --> G2[Guardian 2]
+      MESH --> G3[Guardian 3]
+      G1 --> CONS[Consensus Engine]
+      G2 --> CONS
+      G3 --> CONS
+      CONS --> GATE[Policy + Action Gate]
+      CONS --> BUNDLE[Decision Bundle]
+      BUNDLE --> S[(0G Storage)]
+      CONS --> AUDIT[(GuardMeshAudit<br/>0x522748669646A1a099474cd7f98060968A80E812)]
+    end
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant A as Agent / Client
-    participant API as /api/guardmesh/intent
-    participant G1 as Guardian 1
-    participant G2 as Guardian 2
-    participant G3 as Guardian 3
-    participant AUD as GuardMeshAudit
-    participant S as 0G Storage
+    REGC --> POLICY[On-chain Policy Reads]
+    KV --> POLICY
+    S --> REPLAY[Replay / Audit Retrieval]
+    AUDIT --> REPLAY
+    L1 --> ENSVERIFY[ENS Resolution & Identity Verification]
+    ENSVERIFY --> REGC
 
-    A->>API: Submit intent + policy context
-    API->>G1: evaluate_intent
-    API->>G2: evaluate_intent
-    API->>G3: evaluate_intent
-    G1-->>API: verdict
-    G2-->>API: verdict
-    G3-->>API: verdict
-    API->>API: Compute consensus
-    API->>S: Upload decision bundle
-    S-->>API: merkle/root metadata
-    API->>AUD: recordDecision(...)
-    AUD-->>API: tx receipt
-    API-->>A: approved/blocked + audit refs
+    EVM[0G Galileo EVM Chain 16602] --- REGC
+    EVM --- AUDIT
+    EVM --- KV
 ```
 
 ## ENS in This Project
