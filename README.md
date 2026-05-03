@@ -1,47 +1,58 @@
-# GenGuard / GuardMesh
+# GenGuard 
+![GenGuard Hero](Web/public/front.png)
 
-GenGuard is a decentralized governance and safety layer for autonomous AI agents.  
-It combines on-chain policy, multi-guardian consensus over Gensyn AXL, ENS-based identity, and immutable audit on 0G.
+>GenGuard is a decentralized governance and safety layer for autonomous AI agents.  
+>It combines on-chain policy, multi-guardian consensus over Gensyn AXL, ENS-based identity, and immutable audit on 0G.
+
+
 
 ## Problem
 
-Production AI agents now execute real actions (read/write data, call APIs, run tools, change configuration), but most systems still rely on centralized trust assumptions.
+AI agents are no longer just answering questions, they are taking actions:
+posting messages, changing permissions, querying databases, and executing code.
+Autonomously, and often without asking for deterministic approval.
 
-Key gaps we address:
+The existing safety stack is mostly centralized. One server decides what agents
+can and cannot do. That creates:
 
-1. No deterministic gate before high-risk execution  
-Most agent stacks allow action execution after a single backend check, which can fail open or be bypassed.
+- One point of failure
+- One point of compromise
+- One conflict of interest (the same vendor can provide both the agent and its safety layer)
 
-2. Single-point policy control  
-If one policy server or one operator is compromised, unsafe actions may still pass.
+The March 2026 Meta internal agent incident showed the cost of this model:
+an agent acted outside role boundaries, triggered an unauthorized workflow,
+and exposed sensitive data internally for hours before containment.
+No reliable checkpoint stopped it in real time, and post-incident replay was limited.
 
-3. Poor incident replayability  
-Teams cannot reliably prove who requested what, who approved it, and which policy version was used.
-
-4. Weak identity layer  
-Opaque agent IDs are hard to audit across systems; identity is often not portable or human-readable.
-
-5. Inconsistent policy propagation  
-Different enforcement nodes can evaluate against stale or different policy snapshots.
+This is not isolated. Autonomous agents are now an accelerating enterprise risk class,
+and incidents rise as agents are granted broader permissions in production systems.
 
 ## Solution
 
-GenGuard enforces a deterministic, decentralized governance pipeline:
+GuardMesh is a decentralized firewall for AI agents.
+Instead of executing sensitive actions directly, the agent sends one governed request.
 
-1. Policy-first registration on 0G contracts  
-Every agent is registered with role scope and allowed actions in `GuardMeshRegistry` / `GuardMeshRegistryENS`.
+1. One integration point for agent developers  
+Replace direct execution with one HTTP POST to GuardMesh intent API.
 
-2. Consensus-based action control over Gensyn AXL  
-Before execution, intents are broadcast to 3 guardian nodes. Final action depends on threshold consensus (approve/block/hard-stop).
+2. Three independent guardians over Gensyn AXL  
+Intent is sent peer-to-peer to independent guardian nodes, not through a single central gate.
+Each guardian evaluates identity, role scope, action permissions, and content risk.
 
-3. Consistent policy reads via 0G KV mirror  
-On-chain policy is mirrored into 0G KV so all guardians evaluate against the same state.
+3. Threshold consensus decides execution  
+Majority block -> action is stopped and human escalation is triggered.  
+Majority approve -> action executes.  
+Threshold mode is configurable (`majority`, `unanimous`, etc.) per organization risk profile.
 
-4. Human-readable identity via ENS  
-For `.eth` agent IDs, ENS registration/linkage maps governance decisions to portable names (for example `myagentmeta.eth`).
+4. Full immutable evidence on 0G  
+Every intent, guardian verdict, and final outcome is written to 0G Storage and anchored to 0G chain contracts (`GuardMeshAudit`), making the trail tamper-proof and replayable.
 
-5. Immutable audit trail on 0G  
-Decision bundles are persisted to 0G Storage and anchored through `GuardMeshAudit` with verifiable tx/root references.
+5. ENS-linked identity and attribution  
+Agent IDs can be bound to ENS names (for example `myagentmeta.eth`) through `GuardMeshRegistryENS`,
+so policy and audit records remain human-readable and portable.
+
+If this model had been in place during the Meta-style incident, the out-of-scope action
+would have been blocked at intent time, with an immutable audit entry instead of hours of uncontrolled exposure.
 
 ## Deployed Contracts (0G Galileo Testnet, Chain ID 16602)
 
