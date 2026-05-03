@@ -551,23 +551,6 @@ export default function PolicyEditorPage() {
           Register agents and update policies on <strong>GuardMeshRegistry</strong>. Writes use your
           connected wallet on 0G Galileo and cost testnet 0G gas.
         </p>
-        <p className="mt-2 text-xs text-black/40 leading-relaxed max-w-2xl">
-          Only one registry transaction runs at a time here so MetaMask does not stack Queued txs.
-          If Activity stays Pending, MetaMask cannot reach the chain RPC — open the network in MetaMask
-          and set the URL to <span className="font-mono text-[11px]">{OG_GALILEO.rpcUrl}</span>, or
-          cancel the stuck tx and retry once.
-        </p>
-        <p className="mt-2 text-xs text-black/40 leading-relaxed max-w-2xl">
-          After each successful registry write, this page calls{" "}
-          <span className="font-mono text-[11px]">POST /api/guardmesh/kv-sync</span> to copy{" "}
-          <strong>on-chain</strong> <span className="font-mono text-[11px]">getPolicy</span> into{" "}
-          <strong>0G KV</strong> (same key as <span className="font-mono text-[11px]">agent_id</span>), so
-          guardians with <span className="font-mono text-[11px]">GUARDMESH_KV_NODE_URL</span> stay aligned
-          with the registry.           Match server <span className="font-mono text-[11px]">GUARDMESH_TOOL_SECRET</span> via Policy
-          editor below, or set <span className="font-mono text-[11px]">NEXT_PUBLIC_GUARDMESH_TOOL_SECRET</span>{" "}
-          in <span className="font-mono text-[11px]">Web/.env.local</span> (localhost only). Configure{" "}
-          <span className="font-mono text-[11px]">GUARDMESH_KV_WRITER_PRIVATE_KEY</span> on the Web server for KV writes.
-        </p>
         {!address ? (
           <p className="mt-3 text-xs text-amber-800/90">Connect wallet from the landing page header to manage your agents.</p>
         ) : !is0gNetwork ? (
