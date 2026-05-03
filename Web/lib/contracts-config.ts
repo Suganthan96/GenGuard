@@ -2,7 +2,7 @@ import { OG_GALILEO } from "@/lib/chain-0g"
 
 export const GUARDMESH_REGISTRY_ADDRESS =
   (process.env.NEXT_PUBLIC_REGISTRY_ADDRESS as `0x${string}` | undefined) ??
-  "0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619"
+  "0x0925e20438AF659048643Ce747aEe38A7b916E54"
 
 export const GUARDMESH_AUDIT_ADDRESS =
   (process.env.NEXT_PUBLIC_AUDIT_ADDRESS as `0x${string}` | undefined) ??

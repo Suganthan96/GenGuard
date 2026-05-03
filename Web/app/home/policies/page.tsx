@@ -13,6 +13,7 @@ import {
 } from "@/lib/guardmesh-local-prefs"
 import { parseCommaList } from "@/lib/tx-utils"
 import { THRESHOLD, thresholdLabel } from "@/lib/contracts-config"
+import { GUARDMESH_REGISTRY_ADDRESS } from "@/lib/contracts-config"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -43,12 +44,20 @@ type Tab = "mine" | "network"
 type KvSyncResult =
   | { ok: true; agentId: string; txHash: string; rootHash: string; explorer?: string }
   | { ok: false; agentId: string; error: string }
+type EnsStepResult =
+  | { status: "linked"; ensName: string; link: string }
+  | { status: "skipped"; reason: string }
+  | { status: "failed"; reason: string }
 type AgentTxRow = {
   kind: "registered" | "policy_updated" | "deactivated" | "reactivated"
   txHash: string
   blockNumber: number
   logIndex: number
 }
+
+type EnsRegisterApiResult =
+  | { ok: true; already_registered: boolean; name: string; owner: string; explorer?: string; note?: string }
+  | { ok: false; error: string }
 
 /**
  * Push on-chain `getPolicy` to 0G KV (`POST /api/guardmesh/kv-sync`) so KV cannot drift from the registry.
@@ -112,6 +121,32 @@ async function syncKvFromChain(agentId: string): Promise<KvSyncResult> {
   }
 }
 
+async function ensureEnsRegistered(agentId: string, ownerAddress: string): Promise<EnsRegisterApiResult> {
+  const { toolSecret } = loadGuardmeshLocalToolPrefs()
+  const fallback = process.env.NEXT_PUBLIC_GUARDMESH_TOOL_SECRET?.trim() || ""
+  const bearer = toolSecret.trim() || fallback
+  if (!bearer) {
+    return { ok: false, error: "Missing GuardMesh tool secret for ENS registration route." }
+  }
+  try {
+    const r = await fetch("/api/guardmesh/ens-register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${bearer}`,
+      },
+      body: JSON.stringify({ agent_id: agentId, owner_address: ownerAddress }),
+    })
+    const j = (await r.json().catch(() => ({}))) as EnsRegisterApiResult
+    if (!r.ok) {
+      return { ok: false, error: "error" in j && typeof j.error === "string" ? j.error : String(r.status) }
+    }
+    return j
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 const ROLE_PRESETS = [
   { value: "code_analysis_only", label: "Code analysis only" },
   { value: "read_file_only", label: "Read file only" },
@@ -152,6 +187,7 @@ export default function PolicyEditorPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [policyDialogOpen, setPolicyDialogOpen] = useState(false)
   const [lastKvSync, setLastKvSync] = useState<KvSyncResult | null>(null)
+  const [lastEnsStep, setLastEnsStep] = useState<EnsStepResult | null>(null)
   const [agentTxRows, setAgentTxRows] = useState<AgentTxRow[]>([])
   const [agentTxLoading, setAgentTxLoading] = useState(false)
   const [agentTxErr, setAgentTxErr] = useState<string | null>(null)
@@ -322,17 +358,138 @@ export default function PolicyEditorPage() {
 
   const onRegister = async () => {
     if (!address || !is0gNetwork) return
+    const agentId = regAgentId.trim()
+    if (!agentId) {
+      toast.error("Agent ID is required.")
+      return
+    }
+    const ensName = agentId.toLowerCase().endsWith(".eth") ? agentId : ""
+    console.info("[Policies ENS] register start", {
+      agentId,
+      ensName,
+      runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+      is0gNetwork,
+      wallet: address,
+    })
     const role = resolvedRegRole || "code_analysis_only"
     const allowed = mergeAllowedActions(regKnown, regExtraAllowed)
     const ok = await runRegistryTx("Agent registered", (reg) =>
-      reg.registerAgent.populateTransaction(regAgentId.trim(), role, allowed)
+      reg.registerAgent.populateTransaction(agentId, role, allowed)
     )
     if (ok) {
-      const id = regAgentId.trim()
+      const id = agentId
+      setLastEnsStep(null)
+      const kv = await syncKvFromChain(id)
+      setLastKvSync(kv)
+      if (!kv.ok) {
+        toast.error("Agent is on-chain, but 0G KV push failed. Fix KV writer settings and retry sync.")
+        setLastEnsStep(
+          ensName
+            ? { status: "failed", reason: "ENS step not started because 0G KV sync failed." }
+            : { status: "skipped", reason: "Agent ID is not an .eth name, so ENS link is not attempted." }
+        )
+        return
+      }
+
+      if (ensName) {
+        const ensRegistration = await ensureEnsRegistered(id, address)
+        if (!ensRegistration.ok) {
+          console.error("[Policies ENS] sepolia ENS registration failed", {
+            ensName,
+            error: ensRegistration.error,
+          })
+          toast.error(`ENS registration failed: ${ensRegistration.error}`)
+          setLastEnsStep({ status: "failed", reason: `ENS registration failed: ${ensRegistration.error}` })
+          return
+        }
+        console.info("[Policies ENS] sepolia ENS registration ok", ensRegistration)
+
+        let ensCapable = true
+        try {
+          const regAnyRead = registryRead as any
+          const hasAssign =
+            typeof regAnyRead?.interface?.getFunction === "function" &&
+            !!regAnyRead.interface.getFunction("assignENSName")
+          if (hasAssign) {
+            console.info("[Policies ENS] ENS capability probe passed (assignENSName present in ABI/interface)", {
+              runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            })
+          } else {
+            ensCapable = false
+            console.warn("[Policies ENS] ENS capability probe failed: assignENSName missing in ABI/interface", {
+              runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            })
+          }
+        } catch (e) {
+          ensCapable = false
+          console.warn("[Policies ENS] ENS capability probe reverted/failed", {
+            runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            error: e instanceof Error ? e.message : String(e),
+          })
+        }
+        if (!ensCapable) {
+          console.warn("[Policies ENS] skipping ENS step", {
+            reason: "Registry does not expose ENS methods at runtime",
+            runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            agentId,
+            ensName,
+          })
+          toast.message(
+            "ENS step skipped: current registry does not expose ENS methods. Set NEXT_PUBLIC_REGISTRY_ADDRESS to GuardMeshRegistryENS."
+          )
+          setRegAgentId("")
+          await loadMine()
+          if (id) setSelectedId(id)
+          return
+        }
+
+        const ensOk = await runRegistryTx("ENS linked", (reg) => {
+          const regAny = reg as any
+          if (!regAny.assignENSName?.populateTransaction) {
+            console.warn("[Policies ENS] assignENSName missing on signer contract instance", {
+              runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            })
+            throw new Error(
+              "Connected registry ABI/contract has no assignENSName. Switch NEXT_PUBLIC_REGISTRY_ADDRESS to GuardMeshRegistryENS."
+            )
+          }
+          console.info("[Policies ENS] submitting assignENSName tx", {
+            runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            agentId: id,
+            ensName,
+            resolvedAddress: address,
+          })
+          return regAny.assignENSName.populateTransaction(id, ensName, address)
+        })
+        if (!ensOk) {
+          console.error("[Policies ENS] ENS link tx failed", {
+            runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+            agentId: id,
+            ensName,
+          })
+          toast.error("Agent + 0G KV done, but ENS step failed. Fix ENS/registry setup and retry ENS link.")
+          setLastEnsStep({ status: "failed", reason: "ENS link transaction failed." })
+          return
+        }
+        console.info("[Policies ENS] ENS link tx succeeded", {
+          runtimeRegistryAddress: GUARDMESH_REGISTRY_ADDRESS,
+          agentId: id,
+          ensName,
+          link: `https://sepolia.app.ens.domains/${encodeURIComponent(ensName)}`,
+        })
+        setLastEnsStep({
+          status: "linked",
+          ensName,
+          link: `https://sepolia.app.ens.domains/${encodeURIComponent(ensName)}`,
+        })
+      } else {
+        setLastEnsStep({ status: "skipped", reason: "Use an Agent ID ending with .eth to link ENS." })
+      }
+
       setRegAgentId("")
       await loadMine()
       if (id) setSelectedId(id)
-      setLastKvSync(await syncKvFromChain(id))
+      toast.success(ensName ? "Registration complete: on-chain + ENS + 0G KV" : "Registration complete: on-chain + 0G KV")
     }
   }
 
@@ -478,6 +635,31 @@ export default function PolicyEditorPage() {
           )}
         </section>
       ) : null}
+      {lastEnsStep ? (
+        <section
+          className={
+            "rounded-xl border p-3 text-xs " +
+            (lastEnsStep.status === "linked"
+              ? "border-emerald-300/60 bg-emerald-50/50 text-emerald-900"
+              : lastEnsStep.status === "failed"
+                ? "border-red-300/60 bg-red-50/50 text-red-900"
+                : "border-amber-300/60 bg-amber-50/50 text-amber-900")
+          }
+        >
+          {lastEnsStep.status === "linked" ? (
+            <div className="space-y-1">
+              <div>
+                ENS linked for <span className="font-mono">{lastEnsStep.ensName}</span>
+              </div>
+              <a href={lastEnsStep.link} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                Open ENS name
+              </a>
+            </div>
+          ) : (
+            <div>{lastEnsStep.reason}</div>
+          )}
+        </section>
+      ) : null}
 
       {tab === "network" ? (
         <section className="space-y-3">
@@ -508,7 +690,13 @@ export default function PolicyEditorPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Agent ID</Label>
-                <Input value={regAgentId} onChange={(e) => setRegAgentId(e.target.value)} placeholder="eng-assistant-04" />
+                <Input
+                  value={regAgentId}
+                  onChange={(e) => {
+                    setRegAgentId(e.target.value)
+                  }}
+                  placeholder="eng-assistant-04 or myawesomeagent.eth"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Role scope</Label>
