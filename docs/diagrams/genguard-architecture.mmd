@@ -1,0 +1,49 @@
+sequenceDiagram
+    autonumber
+    participant U as User Wallet / Client
+    participant UI as Web UI (Next.js)
+    participant API as GuardMesh API Layer
+    participant REG as RegistryENS (0x0925...E54)
+    participant KV as 0G KV Mirror
+    participant ENS as Sepolia ENS
+    participant G1 as Guardian 1
+    participant G2 as Guardian 2
+    participant G3 as Guardian 3
+    participant ST as 0G Storage
+    participant AUD as Audit (0x5227...E812)
+
+    rect rgb(20, 28, 45)
+    Note over U,AUD: Registration + Identity Bootstrap
+    U->>UI: Submit agentId (myagent.eth), role, actions
+    UI->>API: register request
+    API->>REG: registerAgent(agentId, roleScope, allowedActions)
+    REG-->>API: tx confirmed
+    API->>KV: kv-sync (mirror policy)
+    KV-->>API: rootHash + txHash
+    alt agentId ends with .eth
+      API->>ENS: commit + register (Sepolia)
+      ENS-->>API: registered / already registered
+      API->>REG: assignENSName(agentId, ensName, owner)
+      REG-->>API: ENS linked on 0G
+    end
+    API-->>UI: registration complete
+    end
+
+    rect rgb(20, 28, 45)
+    Note over U,AUD: Governed Intent Execution
+    U->>UI: Request risky action / tool execution
+    UI->>API: POST intent + context
+    API->>REG: read policy for agentId
+    API->>G1: evaluate_intent
+    API->>G2: evaluate_intent
+    API->>G3: evaluate_intent
+    G1-->>API: verdict
+    G2-->>API: verdict
+    G3-->>API: verdict
+    API->>API: compute consensus + action gate
+    API->>ST: upload decision bundle
+    ST-->>API: merkle root / storage receipt
+    API->>AUD: recordDecision(...)
+    AUD-->>API: tx receipt
+    API-->>UI: approved/blocked + replay refs
+    end

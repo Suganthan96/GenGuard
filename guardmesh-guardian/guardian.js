@@ -22,7 +22,7 @@ const GUARDIAN_ID = process.env.GUARDIAN_ID || "guardian-1";
 const GUARDMESH_REGISTRY_ADDRESS =
   process.env.GUARDMESH_REGISTRY_ADDRESS ||
   process.env.REGISTRY_ADDRESS ||
-  "0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619";
+  "0x0925e20438AF659048643Ce747aEe38A7b916E54";
 
 // Guardian System Prompt
 const GUARDIAN_SYSTEM_PROMPT = `You are a GuardMesh Guardian Agent. Your role is to evaluate AI agent actions before they execute.
@@ -85,6 +85,7 @@ class GuardianAgent {
     
     console.log(`[${this.guardianId}] Wallet: ${this.wallet.address}`);
     console.log(`[${this.guardianId}] Network: ${RPC_URL}`);
+    console.log(`[${this.guardianId}] GuardMesh registry: ${GUARDMESH_REGISTRY_ADDRESS}`);
 
     try {
       this.broker = await createZGComputeNetworkBroker(this.wallet);
