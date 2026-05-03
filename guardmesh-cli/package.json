@@ -1,0 +1,64 @@
+{
+  "name": "guardmesh-cli",
+  "version": "1.1.0",
+  "description": "CLI framework for building governed AI agents on 0G with GuardMesh",
+  "main": "dist/index.js",
+  "bin": {
+    "guardmesh": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "guardmesh",
+    "0g",
+    "ai-agents",
+    "governance",
+    "framework",
+    "blockchain",
+    "tee",
+    "audit",
+    "cli"
+  ],
+  "author": "GuardMesh Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Suganthan96/GenGuard.git",
+    "directory": "guardmesh-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Suganthan96/GenGuard/issues"
+  },
+  "homepage": "https://github.com/Suganthan96/GenGuard#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "FRAMEWORK_GUIDE.md",
+    "QUICK_REFERENCE.md"
+  ],
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "inquirer": "^8.2.6",
+    "ethers": "^6.11.1",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5",
+    "yaml": "^2.4.0",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/inquirer": "^8.2.10",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.1"
+  }
+}
