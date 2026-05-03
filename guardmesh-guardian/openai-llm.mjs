@@ -57,7 +57,7 @@ export async function evaluateWithGroq(intentPayload, guardianId = 'guardian') {
       { role: 'user', content: JSON.stringify(intentPayload, null, 2) }
     ];
 
-    console.log(`[${guardianId}] Sending to Groq (${model})...`);
+    console.log(`[${guardianId}] Sending to qwen-2.5-7b-instruct (${model})...`);
 
     const res = await fetch(endpoint, {
       method: 'POST',
@@ -94,7 +94,7 @@ export async function evaluateWithGroq(intentPayload, guardianId = 'guardian') {
       throw new Error('Incomplete verdict from Groq LLM');
     }
 
-    console.log(`[${guardianId}] Groq Verdict: ${verdict.verdict}`);
+    console.log(`[${guardianId}] qwen-2.5-7b-instruct Verdict: ${verdict.verdict}`);
     console.log(`[${guardianId}] Reason: ${verdict.reason}`);
 
     return {
@@ -102,11 +102,11 @@ export async function evaluateWithGroq(intentPayload, guardianId = 'guardian') {
       timestamp: new Date().toISOString(),
       verdict,
       teeVerified: false,
-      model: `groq/${model}`,
+      model: `qwen-2.5-7b-instruct/${model}`,
       usedGroq: true,
     };
   } catch (error) {
-    console.error(`[${guardianId}] Groq evaluation failed:`, error.message);
+    console.error(`[${guardianId}] qwen-2.5-7b-instruct evaluation failed:`, error.message);
     return {
       guardian_id: guardianId,
       timestamp: new Date().toISOString(),
@@ -115,7 +115,7 @@ export async function evaluateWithGroq(intentPayload, guardianId = 'guardian') {
         permission_check: 'FAIL',
         content_check: 'FAIL',
         verdict: 'BLOCK',
-        reason: `Groq evaluation error: ${error.message}`,
+        reason: `qwen-2.5-7b-instruct evaluation error: ${error.message}`,
       },
       teeVerified: false,
       error: error.message,
