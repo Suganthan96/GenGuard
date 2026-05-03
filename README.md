@@ -53,43 +53,43 @@ Recommended active registry in web app:
 
 ```mermaid
 flowchart TD
-    U[User / Agent Client] --> W[Web Dashboard + APIs<br/>Next.js]
+    U["User / Agent Client"] --> W["Web Dashboard + APIs (Next.js)"]
 
     subgraph REG[Registration & Identity Flow]
-      W --> R1[registerAgent on 0G]
-      R1 --> REGC[(GuardMeshRegistryENS<br/>0x0925e20438AF659048643Ce747aEe38A7b916E54)]
-      W --> KV1[POST /api/guardmesh/kv-sync]
-      KV1 --> KV[(0G KV Policy Mirror)]
-      W --> ENSR[POST /api/guardmesh/ens-register<br/>Sepolia commit-reveal]
-      ENSR --> ENS[(Sepolia ENS Registrar)]
-      ENS --> L1[.eth name minted / exists]
-      W --> R2[assignENSName on 0G]
+      W --> R1["registerAgent on 0G"]
+      R1 --> REGC["GuardMeshRegistryENS (0x0925e20438AF659048643Ce747aEe38A7b916E54)"]
+      W --> KV1["Call KV Sync API"]
+      KV1 --> KV["0G KV Policy Mirror"]
+      W --> ENSR["Call ENS Register API (Sepolia commit-reveal)"]
+      ENSR --> ENS["Sepolia ENS Registrar"]
+      ENS --> L1[".eth name minted or already registered"]
+      W --> R2["assignENSName on 0G"]
       R2 --> REGC
     end
 
     subgraph RUN[Intent Governance Runtime]
-      W --> INTENT[/api/guardmesh/intent]
-      INTENT --> MESH[AXL Guardian Mesh]
-      MESH --> G1[Guardian 1]
-      MESH --> G2[Guardian 2]
-      MESH --> G3[Guardian 3]
-      G1 --> CONS[Consensus Engine]
+      W --> INTENT["Intent API"]
+      INTENT --> MESH["AXL Guardian Mesh"]
+      MESH --> G1["Guardian 1"]
+      MESH --> G2["Guardian 2"]
+      MESH --> G3["Guardian 3"]
+      G1 --> CONS["Consensus Engine"]
       G2 --> CONS
       G3 --> CONS
-      CONS --> GATE[Policy + Action Gate]
-      CONS --> BUNDLE[Decision Bundle]
-      BUNDLE --> S[(0G Storage)]
-      CONS --> AUDIT[(GuardMeshAudit<br/>0x522748669646A1a099474cd7f98060968A80E812)]
+      CONS --> GATE["Policy + Action Gate"]
+      CONS --> BUNDLE["Decision Bundle"]
+      BUNDLE --> S["0G Storage"]
+      CONS --> AUDIT["GuardMeshAudit (0x522748669646A1a099474cd7f98060968A80E812)"]
     end
 
-    REGC --> POLICY[On-chain Policy Reads]
+    REGC --> POLICY["On-chain Policy Reads"]
     KV --> POLICY
-    S --> REPLAY[Replay / Audit Retrieval]
+    S --> REPLAY["Replay / Audit Retrieval"]
     AUDIT --> REPLAY
-    L1 --> ENSVERIFY[ENS Resolution & Identity Verification]
+    L1 --> ENSVERIFY["ENS Resolution + Identity Verification"]
     ENSVERIFY --> REGC
 
-    EVM[0G Galileo EVM Chain 16602] --- REGC
+    EVM["0G Galileo EVM Chain 16602"] --- REGC
     EVM --- AUDIT
     EVM --- KV
 ```
