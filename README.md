@@ -52,46 +52,55 @@ Recommended active registry in web app:
 ## End-to-End Architecture
 
 ```mermaid
-flowchart TD
-    U["User / Agent Client"] --> W["Web Dashboard + APIs (Next.js)"]
+sequenceDiagram
+    autonumber
+    participant U as User Wallet / Client
+    participant UI as Web UI (Next.js)
+    participant API as GuardMesh API Layer
+    participant REG as RegistryENS (0x0925...E54)
+    participant KV as 0G KV Mirror
+    participant ENS as Sepolia ENS
+    participant G1 as Guardian 1
+    participant G2 as Guardian 2
+    participant G3 as Guardian 3
+    participant ST as 0G Storage
+    participant AUD as Audit (0x5227...E812)
 
-    subgraph REG[Registration & Identity Flow]
-      W --> R1["registerAgent on 0G"]
-      R1 --> REGC["GuardMeshRegistryENS (0x0925e20438AF659048643Ce747aEe38A7b916E54)"]
-      W --> KV1["Call KV Sync API"]
-      KV1 --> KV["0G KV Policy Mirror"]
-      W --> ENSR["Call ENS Register API (Sepolia commit-reveal)"]
-      ENSR --> ENS["Sepolia ENS Registrar"]
-      ENS --> L1[".eth name minted or already registered"]
-      W --> R2["assignENSName on 0G"]
-      R2 --> REGC
+    rect rgb(20, 28, 45)
+    Note over U,AUD: Registration + Identity Bootstrap
+    U->>UI: Submit agentId (example: myagent.eth), role, actions
+    UI->>API: register request
+    API->>REG: registerAgent(agentId, roleScope, allowedActions)
+    REG-->>API: tx confirmed
+    API->>KV: kv-sync (mirror on-chain policy)
+    KV-->>API: rootHash + txHash
+    alt agentId ends with .eth
+      API->>ENS: commit + register (Sepolia)
+      ENS-->>API: registered/already registered
+      API->>REG: assignENSName(agentId, ensName, owner)
+      REG-->>API: ENS linked on 0G
+    end
+    API-->>UI: registration complete
     end
 
-    subgraph RUN[Intent Governance Runtime]
-      W --> INTENT["Intent API"]
-      INTENT --> MESH["AXL Guardian Mesh"]
-      MESH --> G1["Guardian 1"]
-      MESH --> G2["Guardian 2"]
-      MESH --> G3["Guardian 3"]
-      G1 --> CONS["Consensus Engine"]
-      G2 --> CONS
-      G3 --> CONS
-      CONS --> GATE["Policy + Action Gate"]
-      CONS --> BUNDLE["Decision Bundle"]
-      BUNDLE --> S["0G Storage"]
-      CONS --> AUDIT["GuardMeshAudit (0x522748669646A1a099474cd7f98060968A80E812)"]
+    rect rgb(20, 28, 45)
+    Note over U,AUD: Governed Intent Execution
+    U->>UI: Request risky action / tool execution
+    UI->>API: POST intent + context
+    API->>REG: read policy for agentId
+    API->>G1: evaluate_intent
+    API->>G2: evaluate_intent
+    API->>G3: evaluate_intent
+    G1-->>API: verdict
+    G2-->>API: verdict
+    G3-->>API: verdict
+    API->>API: compute consensus + action gate
+    API->>ST: upload decision bundle
+    ST-->>API: merkle root / storage receipt
+    API->>AUD: recordDecision(...)
+    AUD-->>API: tx receipt
+    API-->>UI: approved/blocked + replay refs
     end
-
-    REGC --> POLICY["On-chain Policy Reads"]
-    KV --> POLICY
-    S --> REPLAY["Replay / Audit Retrieval"]
-    AUDIT --> REPLAY
-    L1 --> ENSVERIFY["ENS Resolution + Identity Verification"]
-    ENSVERIFY --> REGC
-
-    EVM["0G Galileo EVM Chain 16602"] --- REGC
-    EVM --- AUDIT
-    EVM --- KV
 ```
 
 ## ENS in This Project
