@@ -4,6 +4,23 @@
 >GenGuard is a decentralized governance and safety layer for autonomous AI agents.  
 >It combines on-chain policy, multi-guardian consensus over Gensyn AXL, ENS-based identity, and immutable audit on 0G.
 
+---
+
+## 0G Hackathon Submission
+
+**Project Description (30 words)**  
+GenGuard is a decentralized firewall for AI agents, combining on-chain governance, multi-guardian consensus, and immutable audit trails on 0G to prevent autonomous agent incidents.
+
+**Track**: Track 1: Agentic Infrastructure & OpenClaw Lab
+
+**0G Components Used**:
+- ✅ **0G Chain (EVM)** – Policy contracts and audit anchoring
+- ✅ **0G Storage** – Decision bundle persistence and replay archive
+- ✅ **0G KV** – Mirrored policy state for guardian reads
+- ✅ **0G Testnet (Galileo, Chain ID 16602)** – Deployed and verified
+
+---
+
 
 
 ## Problem
@@ -58,13 +75,19 @@ would have been blocked at intent time, with an immutable audit entry instead of
 
 From `0g-contracts/deployments/testnet.json` and `0g-contracts/deployments/testnet-ens.json`:
 
-- `GuardMeshRegistry`: `0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619`
-- `GuardMeshAudit`: `0x522748669646A1a099474cd7f98060968A80E812`
-- `GuardMeshRegistryENS`: `0x0925e20438AF659048643Ce747aEe38A7b916E54`
+- **GuardMeshRegistry**: `0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619`  
+  [View on 0G Explorer](https://galileo-testnet.0gscan.com/address/0x0bfB6f131A99D5aaA3071618FFBD5bb3ea87C619)
 
-Recommended active registry for web/guardians:
+- **GuardMeshAudit**: `0x522748669646A1a099474cd7f98060968A80E812`  
+  [View on 0G Explorer](https://galileo-testnet.0gscan.com/address/0x522748669646A1a099474cd7f98060968A80E812)
 
-- `NEXT_PUBLIC_REGISTRY_ADDRESS=0x0925e20438AF659048643Ce747aEe38A7b916E54`
+- **GuardMeshRegistryENS** (Recommended): `0x0925e20438AF659048643Ce747aEe38A7b916E54`  
+  [View on 0G Explorer](https://galileo-testnet.0gscan.com/address/0x0925e20438AF659048643Ce747aEe38A7b916E54)
+
+**Environment Variable for Web/Guardians**:
+```
+NEXT_PUBLIC_REGISTRY_ADDRESS=0x0925e20438AF659048643Ce747aEe38A7b916E54
+```
 
 ## Contract Responsibilities
 
@@ -84,6 +107,36 @@ Recommended active registry for web/guardians:
 - Extends registry with ENS identity mapping
 - Stores ENS name, namehash node, resolved owner/address metadata
 - Supports ENS linkage methods such as `assignENSName` / `registerAgentWithENS`
+
+## 0G Integration Verification
+
+### How to Verify On-Chain Activity
+
+1. **Policy Registration (0G Chain)**  
+   Navigate to: `https://galileo-testnet.0gscan.com/address/0x0925e20438AF659048643Ce747aEe38A7b916E54`
+   - Look for `registerAgent` and `assignENSName` transaction events
+   - Example: Agent policies are stored in `policyRegistry` mapping on GuardMeshRegistryENS
+
+2. **Audit Recording (0G Chain)**  
+   Navigate to: `https://galileo-testnet.0gscan.com/address/0x522748669646A1a099474cd7f98060968A80E812`
+   - Look for `recordDecision` events showing verdict outcomes and storage refs
+   - Each intent governance decision is permanently anchored here
+
+3. **Storage Integration (0G Storage)**  
+   - Decision bundles are uploaded to 0G Storage and referenced in audit records
+   - Merkle roots and storage receipts are stored on-chain for verification
+   - Guardian verdicts are persisted for immutable replay
+
+4. **KV Mirror Sync (0G KV)**  
+   - Policy state is mirrored from on-chain to 0G KV for fast reads by guardians
+   - Guardian nodes query KV stream to fetch agent policies during intent evaluation
+   - Ensures low-latency policy enforcement at guardian edge
+
+### Code Evidence
+
+- **0G Chain Integration**: [0g-contracts/contracts/GuardMeshRegistry.sol](0g-contracts/contracts/GuardMeshRegistry.sol) and [GuardMeshAudit.sol](0g-contracts/contracts/GuardMeshAudit.sol)
+- **0G Storage Usage**: [Web/app/api/guardmesh/intent/route.ts](Web/app/api/guardmesh/intent/route.ts#L120) (uploads decision bundles)
+- **0G KV Integration**: [guardmesh-guardian/kv-policy-get.mjs](guardmesh-guardian/kv-policy-get.mjs) (reads mirrored policies)
 
 ## End-to-End Architecture
 
@@ -266,7 +319,15 @@ Critical guardian variables:
 - `AXL_API_URL`
 - `GUARDIAN_ID`
 
-## Local Run
+## Local Run & Deployment
+
+### Prerequisites
+
+- Node.js 18+ and pnpm
+- Private key with 0G testnet funds (for policy registration)
+- Gensyn AXL node access (for guardian consensus)
+
+### Web Dashboard & API
 
 ```bash
 cd Web
@@ -274,11 +335,106 @@ pnpm install
 pnpm dev
 ```
 
-Open:
+**Access Points**:
+- Dashboard: `http://localhost:3000`
+- Policy Editor: `http://localhost:3000/home/policies`
+- Intent Analyzer: `http://localhost:3000/home/analyze`
 
-- `http://localhost:3000`
-- `http://localhost:3000/home/policies`
-- `http://localhost:3000/home/analyze`
+### Environment Setup
+
+Create `.env.local` in the `Web/` directory:
+
+```env
+# 0G Chain
+NEXT_PUBLIC_0G_RPC_URL=https://galileo-rpc.0g.ai
+NEXT_PUBLIC_REGISTRY_ADDRESS=0x0925e20438AF659048643Ce747aEe38A7b916E54
+NEXT_PUBLIC_AUDIT_ADDRESS=0x522748669646A1a099474cd7f98060968A80E812
+
+# 0G Storage & KV
+GUARDMESH_KV_STREAM_ID=<your-kv-stream-id>
+GUARDMESH_KV_NODE_URL=https://kv.0g.ai
+
+# Guardian Communication (Gensyn AXL)
+AXL_API_URL=<your-axl-endpoint>
+
+# Secrets
+GUARDMESH_TOOL_SECRET=<your-tool-secret>
+ENS_REGISTRAR_PRIVATE_KEY=<your-registrar-key>
+```
+
+### Deploy Contracts (if needed)
+
+```bash
+cd 0g-contracts
+npm install
+npx hardhat run scripts/deploy.js --network 0g-testnet
+```
+
+**Output**: Deployment receipts saved to `0g-contracts/deployments/testnet.json`
+
+### Run Guardians
+
+```bash
+cd guardmesh-guardian
+npm install
+
+# Start Guardian 1
+node guardian.js --id=guardian-1 --policy-source=0g-kv
+
+# In another terminal, start Guardian 2
+node guardian.js --id=guardian-2 --policy-source=0g-kv
+
+# In a third terminal, start Guardian 3
+node guardian.js --id=guardian-3 --policy-source=0g-kv
+```
+
+### Test Intent Flow (E2E)
+
+```bash
+# From Web directory
+curl -X POST http://localhost:3000/api/guardmesh/intent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentId": "myagent.eth",
+    "action": "transfer_funds",
+    "amount": "100",
+    "context": "Transfer requested by user"
+  }'
+```
+
+**Expected Response**:
+```json
+{
+  "decision": "approved",
+  "verdicts": [
+    { "guardianId": "guardian-1", "verdict": "approve" },
+    { "guardianId": "guardian-2", "verdict": "approve" },
+    { "guardianId": "guardian-3", "verdict": "approve" }
+  ],
+  "storageRef": "<merkle-root>",
+  "auditTxHash": "0x..."
+}
+```
+
+### Verify 0G Integration
+
+**Check on-chain audit records**:
+```bash
+curl https://galileo-rpc.0g.ai \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "eth_getLogs",
+    "params": [{
+      "address": "0x522748669646A1a099474cd7f98060968A80E812",
+      "topics": ["0x<DecisionRecorded-event-topic>"]
+    }],
+    "id": 1
+  }'
+```
+
+---
 
 ## Deployment
 
@@ -313,3 +469,53 @@ GenGuard/
 ---
 
 Built on 0G Galileo with Gensyn guardian consensus and ENS-enabled agent identity.
+
+---
+
+## 0G Hackathon Submission Checklist
+
+- [x] **0G Integration**: 3 contracts deployed on 0G Galileo with on-chain activity
+- [x] **Code Repository**: Public GitHub with substantial hackathon-period commits
+- [x] **Documentation**: README with architecture, deployment, and verification steps
+- [x] **Local Deployment**: Judges can run Web, guardians, and end-to-end tests locally
+- [x] **0G Verification**: Explorer links and integration proof documented above
+
+### Demo Video Guidance
+
+Demo video (≤3 min) should show:
+
+1. **Policy Registration Flow** (1 min)
+   - Submit agent policy via Web UI
+   - Show transaction on 0G Explorer
+   - Verify policy synced to KV
+
+2. **Intent Governance in Action** (1 min)
+   - Submit risky action via Web
+   - Show guardians independently evaluating
+   - Show verdict collection and consensus
+
+3. **Immutable Audit Trail** (1 min)
+   - Show final decision recorded on 0G Chain
+   - Navigate 0G Explorer to show `recordDecision` event
+   - Show decision bundle stored on 0G Storage
+
+**Upload**: Post to YouTube/Loom and link in HackQuest submission
+
+### X (Twitter) Post Template
+
+```
+🛡️ GenGuard: Decentralized Safety for AI Agents
+
+AI agents move from reasoning to action. We built a distributed firewall:
+✅ On-chain policy on @0G_labs
+✅ Multi-guardian consensus over @Gensyn
+✅ Immutable audit trail on 0G Storage
+✅ ENS-linked identity for attribution
+
+No single point of failure. No centralized compromise.
+
+#0GHackathon #BuildOn0G
+@0G_labs @0g_CN @0g_Eco @HackQuest_
+
+[Demo Link / Screenshot]
+```
